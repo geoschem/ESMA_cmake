@@ -77,12 +77,42 @@ else()
 	set(ESMF_VERSION "NOTFOUND")
 endif()
 
+# Determine extra link libraries for ESMF built with 3rd party support
+if(EXISTS ${ESMF_MK_FILEPATH})
+    file(READ ${ESMF_MK_FILEPATH} ESMF_MK)
+
+   # Inspect ESMF_F90LINKLIBS to determine any extra extra link libraries that are needed
+   string(REGEX MATCH "ESMF_F90LINKLIBS=[^\n]*" ESMF_F90LINKLIBS "${ESMF_MK}")                  # Get ESMF_F90LINKLIBS line
+   set(ESMF_F90LINKLIBS "${ESMF_F90LINKLIBS}" CACHE INTERNAL "ESMF_F90LINKLIBS from esmf.mk")
+   
+   string(REGEX MATCHALL "-l[^ ]*" ESMF_F90LINKLIB_NAMES "${ESMF_F90LINKLIBS}")                 # Get list of libs
+   string(REPLACE "-l" "" ESMF_F90LINKLIB_NAMES "${ESMF_F90LINKLIB_NAMES}")
+   set(ESMF_F90LINKLIB_NAMES "${ESMF_F90LINKLIB_NAMES}" CACHE INTERNAL "ESMF link libraries from ESMF_F90LINKLIBS")
+
+   # Remove link lib entries that we always link anyways
+   set(ESMF_LINKLIBS_STD ${MPI_CXX_LIB_NAMES} stdc++ rt dl)
+   list(REMOVE_ITEM ESMF_F90LINKLIB_NAMES ${ESMF_LINKLIBS_STD})
+   set(ESMF_F90LINKLIBS_3RD_PARTY "${ESMF_F90LINKLIB_NAMES}" CACHE INTERNAL "ESMF link libraries for 3rd party extensions")
+
+   # Find each link library in ESMF_F90LINKLIBS_3RD_PARTY
+   set(ESMF_LINKLIB_3RD_PARTY_EXTRA_REQUIRED "")
+   foreach(THIRD_PARTY_LIBNAME ${ESMF_F90LINKLIBS_3RD_PARTY})
+      find_library(ESMF_3RD_PARTY_LINKLIB_${THIRD_PARTY_LIBNAME}     # name of cache variable
+         ${THIRD_PARTY_LIBNAME}                                      # name of library 
+         DOC "The path to ESMF 3rd partly link library ${THIRD_PARTY_LIBNAME}."
+         PATH_SUFFIXES "lib"
+      )
+      list(APPEND ESMF_LINKLIB_3RD_PARTY_EXTRA_REQUIRED "ESMF_3RD_PARTY_LINKLIB_${THIRD_PARTY_LIBNAME}")
+   endforeach()
+endif()
+
 # Throw an error if anything went wrong
 find_package_handle_standard_args(ESMF 
 	REQUIRED_VARS 
 		ESMF_HEADERS_DIR 
 		ESMF_MOD_DIR 
-		ESMF_LIBRARY
+      ESMF_LIBRARY
+      ${ESMF_LINKLIB_3RD_PARTY_EXTRA_REQUIRED}
 	VERSION_VAR ESMF_VERSION
 	FAIL_MESSAGE "${ESMF_ERRMSG}"
 )
@@ -103,6 +133,11 @@ if(EXISTS ${ESMF_MK_FILEPATH})
         list(APPEND ESMF_LIBRARIES ${OpenMP_CXX_FLAGS} ${OpenMP_Fortran_FLAGS})
     endif()
 endif()
+
+# Add all third party libraries
+foreach(THIRD_PARTY_LIB ${ESMF_LINKLIB_3RD_PARTY_EXTRA_REQUIRED})
+   list(APPEND ESMF_LIBRARIES ${${THIRD_PARTY_LIB}})
+endforeach()
 
 # Make an imported target for ESMF
 if(NOT TARGET ESMF)
