@@ -28,6 +28,10 @@ macro (esma_add_library this)
     PUBLIC_INCLUDES
     )
   cmake_parse_arguments(ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  
+  # GCHP kludge: we always want NOINSTALL and EXCLUDE_FROM_ALL
+  set(ARGS_NOINSTALL TRUE)
+  set(ARGS_EXCLUDE_FROM_ALL TRUE)
 
   if (ARGS_UNPARSED_ARGUMENTS)
       ecbuild_warn ("Unrecognized keyword arguments passed to esma_add_library: ${ARGS_UNPARSED_ARGUMENTS}")

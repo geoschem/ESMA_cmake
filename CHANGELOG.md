@@ -12,6 +12,114 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Added
 
+## [3.3.5] - 2020-12-23
+
+### Fixed
+
+- Changed `-extend_source` to `-extend-source` due to warning print in
+  Intel 2021
+
+## [3.3.4] - 2020-12-10
+
+### Fixed
+
+- Fixed Aggressive flags with GCC 10
+
+## [3.3.3] - 2020-12-10
+
+### Added
+
+- Add ability for `Aggressive` build type (note: requires [GEOS-ESM/ecbuild geos/v1.0.6](https://github.com/GEOS-ESM/ecbuild/releases/tag/geos%2Fv1.0.6) to use as ecbuild restricts allowed `CMAKE_BUILD_TYPE`)
+
+## [3.3.2] - 2020-12-08
+
+### Fixed
+
+- Fixed `new_esma_generate_automatic_code` macro to better handle automatically generated files (see https://github.com/GEOS-ESM/GEOSchem_GridComp/issues/108)
+
+### Added
+
+- Add changelog enforcer
+
+## [3.3.1] - 2020-11-23
+
+### Removed
+
+- Remove `Externals.cfg` as part of `manage_externals` deprecation
+
+## [3.3.0] - 2020-11-19
+
+### Changed
+
+- Added Docker authentication for CI
+- Updates from UFS to enable use with MAPL without Baselibs (Requires MAPL 2.4.0+)
+
+## [3.2.1] - 2020-09-28
+
+### Fixed
+
+- Fix for default Fortran module directory
+
+## [3.2.0] - 2020-09-22
+
+### Added
+
+- Add support for Arm64 machines
+
+### Changed
+
+- Requirement for MKL is removed (MKL is used if found, otherwise BLAS/LAPACK is used)
+
+## [3.1.4] - 2020-09-18
+
+### Changed
+
+- Update Intel Debug flags to be more comprehensive
+
+### Added
+
+- Add CircleCI testing
+
+## [3.1.3] - 2020-08-07
+
+### Fixed
+
+- Fix for handling f2py tests
+
+## [3.1.2] - 2020-08-04
+
+### Fixed
+
+- Fix for coding of AWS detection found on Ubuntu/CircleCI
+
+## [3.1.1] - 2020-07-31
+
+### Fixed
+
+- Fixes for handling MOM/MOM6 shared libraries on macOS
+
+## [3.1.0] - 2020-07-28
+
+### Added
+
+- Add support to detect AWS systems
+
+## [3.0.7] - 2020-07-16
+
+### Added
+
+- Add an option `USE_F2PY` which by default is `ON` preserving current
+  behavior. (Useful on pioneer systems and containers where f2py might
+  not be available.)
+
+## [3.0.6] - 2020-06-09
+
+### Changed
+
+- Updates in support of MAPL 2.2
+  - Fix up how testing is done
+  - Generalize the stub generator
+
 ## [3.0.5] - 2020-06-05
 
 ### Changed
@@ -39,12 +147,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Typo in message in esma_add_library().
+- Typo in message in `esma_add_library()`.
 
 ### Added
 
-- Added macro esma_add_f2py_module() which wraps existing add_f2py_module() and
-  a call to add_test().
+- Added macro `esma_add_f2py_module()` which wraps existing `add_f2py_module()` and
+  a call to `add_test()`.
 
 ## [3.0.1] - 2020-04-21
 
