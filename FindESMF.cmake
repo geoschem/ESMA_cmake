@@ -79,18 +79,30 @@ endif()
 
 # Determine extra link libraries for ESMF built with 3rd party support
 if(EXISTS ${ESMF_MK_FILEPATH})
-    file(READ ${ESMF_MK_FILEPATH} ESMF_MK)
-
-   # Inspect ESMF_F90LINKLIBS to determine any extra extra link libraries that are needed
-   string(REGEX MATCH "ESMF_F90LINKLIBS=[^\n]*" ESMF_F90LINKLIBS "${ESMF_MK}")                  # Get ESMF_F90LINKLIBS line
-   set(ESMF_F90LINKLIBS "${ESMF_F90LINKLIBS}" CACHE INTERNAL "ESMF_F90LINKLIBS from esmf.mk")
    
-   string(REGEX MATCHALL "-l[^ ]*" ESMF_F90LINKLIB_NAMES "${ESMF_F90LINKLIBS}")                 # Get list of libs
+   # Read esmf.mk
+   file(READ ${ESMF_MK_FILEPATH} ESMF_MK)
+
+   # Copy ESMF_F90LINKLIBS line
+   string(REGEX MATCH "ESMF_F90LINKLIBS=[^\n]*" ESMF_F90LINKLIBS "${ESMF_MK}")
+   set(ESMF_F90LINKLIBS "${ESMF_F90LINKLIBS}" CACHE INTERNAL "ESMF_F90LINKLIBS from esmf.mk")
+
+   # Copy ESMF_F90LINKPATHS line
+   string(REGEX MATCH "ESMF_F90LINKPATHS=[^\n]*" ESMF_F90LINKPATHS "${ESMF_MK}")
+   set(ESMF_F90LINKPATHS "${ESMF_F90LINKPATHS}" CACHE INTERNAL "ESMF_F90LINKPATHS from esmf.mk")
+   
+   # Get list of -l linker arguments (lib names)
+   string(REGEX MATCHALL "-l[^ ]*" ESMF_F90LINKLIB_NAMES "${ESMF_F90LINKLIBS}")
    string(REPLACE "-l" "" ESMF_F90LINKLIB_NAMES "${ESMF_F90LINKLIB_NAMES}")
    set(ESMF_F90LINKLIB_NAMES "${ESMF_F90LINKLIB_NAMES}" CACHE INTERNAL "ESMF link libraries from ESMF_F90LINKLIBS")
 
+   # Get list of -L linker arguments (lib dirs)
+   string(REGEX MATCHALL "-L[^ ]*" ESMF_F90LINKLIB_DIRS "${ESMF_F90LINKLIBS} ${ESMF_F90LINKPATHS}")
+   string(REPLACE "-L" "" ESMF_F90LINKLIB_DIRS "${ESMF_F90LINKLIB_DIRS}")
+   set(ESMF_F90LINKLIB_DIRS "${ESMF_F90LINKLIB_DIRS}" CACHE INTERNAL "ESMF link libraries dirs from ESMF_F90LINKLIBS")
+
    # Remove link lib entries that we always link anyways
-   set(ESMF_LINKLIBS_STD ${MPI_CXX_LIB_NAMES} stdc++ rt dl)
+   set(ESMF_LINKLIBS_STD ${MPI_CXX_LIB_NAMES} stdc++ rt dl netcdf netcdff)
    list(REMOVE_ITEM ESMF_F90LINKLIB_NAMES ${ESMF_LINKLIBS_STD})
    set(ESMF_F90LINKLIBS_3RD_PARTY "${ESMF_F90LINKLIB_NAMES}" CACHE INTERNAL "ESMF link libraries for 3rd party extensions")
 
@@ -99,6 +111,7 @@ if(EXISTS ${ESMF_MK_FILEPATH})
    foreach(THIRD_PARTY_LIBNAME ${ESMF_F90LINKLIBS_3RD_PARTY})
       find_library(ESMF_3RD_PARTY_LINKLIB_${THIRD_PARTY_LIBNAME}     # name of cache variable
          ${THIRD_PARTY_LIBNAME}                                      # name of library 
+         HINTS ${ESMF_F90LINKLIB_DIRS} ""
          DOC "The path to ESMF 3rd partly link library ${THIRD_PARTY_LIBNAME}."
          PATH_SUFFIXES "lib"
       )
@@ -114,7 +127,7 @@ find_package_handle_standard_args(ESMF
       ESMF_LIBRARY
       ${ESMF_LINKLIB_3RD_PARTY_EXTRA_REQUIRED}
 	VERSION_VAR ESMF_VERSION
-	FAIL_MESSAGE "${ESMF_ERRMSG}"
+	FAIL_MESSAGE "Couldn't find one or more files in your ESMF installation! Set CMAKE_PREFIX_PATH to the directory/ies containing the missing files to finish locating ESMF."
 )
 
 # Specify the other libraries that need to be linked for ESMF
