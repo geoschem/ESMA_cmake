@@ -152,6 +152,13 @@ foreach(THIRD_PARTY_LIB ${ESMF_LINKLIB_3RD_PARTY_EXTRA_REQUIRED})
    list(APPEND ESMF_LIBRARIES ${${THIRD_PARTY_LIB}})
 endforeach()
 
+# Handle Intel MKL specially because it uses -mkl flag with Intel compilers
+if(ESMF_F90LINKLIBS MATCHES "-mkl")
+   unset(CMAKE_DISABLE_FIND_PACKAGE_MKL)
+   find_package(MKL REQUIRED)                    # ecbuild/cmake/FindMKL.cmake
+   list(APPEND ESMF_LIBRARIES ${MKL_LIBRARIES})  # defined by FindMKL.cmake
+endif()
+
 # Make an imported target for ESMF
 if(NOT TARGET ESMF)
 	add_library(ESMF STATIC IMPORTED)
