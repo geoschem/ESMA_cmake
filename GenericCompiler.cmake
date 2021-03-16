@@ -5,3 +5,5 @@ set (GEOS_Fortran_FLAGS_VECT    "${GEOS_Fortran_Vect_Flags} ${common_Fortran_fla
 # Use separate_arguments to split options into semicolon separated list
 separate_arguments(GEOS_Fortran_FLAGS_RELEASE UNIX_COMMAND ${GEOS_Fortran_FLAGS_RELEASE})
 separate_arguments(GEOS_Fortran_FLAGS_DEBUG UNIX_COMMAND ${GEOS_Fortran_FLAGS_DEBUG})
+separate_arguments(GEOS_Fortran_FLAGS_VECT UNIX_COMMAND ${GEOS_Fortran_FLAGS_VECT})
+
