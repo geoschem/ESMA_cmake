@@ -8,6 +8,10 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     message(STATUS "*** Override with -DCMAKE_INSTALL_PREFIX=<path>.")
 endif()
 
+# FindPython often finds the wrong python (system rather than a python stack
+# provided by GEOS-ESM maintainers). This allows us 
+find_program(Python_EXECUTABLE python python3 python2)
+
 # Bring in ecbuild
 if (IS_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/ecbuild")
   list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/ecbuild/cmake")
@@ -16,10 +20,9 @@ elseif (IS_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/@ecbuild")
 elseif (IS_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/ecbuild@")
   list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/ecbuild@/cmake")
 else ()
-  message (FATAL_ERROR "ecbuild subdir not found")
+  find_package(ecbuild REQUIRED)
 endif()
   
-#set (BUILD_SHARED_LIBS OFF)
 option(BUILD_SHARED_LIBS "Build the shared library" OFF)
 set (ECBUILD_2_COMPAT_VALUE OFF)
 include (ecbuild_system NO_POLICY_SCOPE)
@@ -70,7 +73,8 @@ if (APPLE)
   include(osx_extras)
 endif ()
 
-find_package (OpenMP REQUIRED COMPONENTS Fortran)
+# OpenMP support
+find_package (OpenMP)
 
 # Threading support
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
@@ -100,7 +104,44 @@ if (APPLE)
     endif ()
   endif ()
 else ()
-  find_package (MKL ${MKL_IS_REQUIRED_ARG})
+  set (MKL_Fortran True)
+endif ()
+
+# GCHP: make MKL search configurable
+find_package(MKL ${MKL_IS_REQUIRED_ARG})
+#find_package(MKL)
+if (MKL_FOUND)
+   ecbuild_info("Found MKL:")
+   ecbuild_info("  MKL_INCLUDE_DIRS: ${MKL_INCLUDE_DIRS}")
+   ecbuild_info("  MKL_LIBRARIES: ${MKL_LIBRARIES}")
+
+   set(BLA_VENDOR Intel10_64lp_seq)
+endif ()
+
+# GCHP: make LAPACK search configurable
+find_package(LAPACK ${LAPACK_IS_REQUIRED_ARG})
+#find_package(LAPACK)
+if (LAPACK_FOUND)
+   ecbuild_info("Found LAPACK:")
+   ecbuild_info("  LAPACK_LINKER_FLAGS: ${LAPACK_LINKER_FLAGS}")
+   ecbuild_info("  LAPACK_LIBRARIES: ${LAPACK_LIBRARIES}")
+   if (LAPACK95_FOUND)
+      ecbuild_info("Found LAPACK95:")
+      ecbuild_info("  LAPACK95_LIBRARIES: ${LAPACK95_LIBRARIES}")
+   endif ()
+endif ()
+
+# GCHP: make BLAS search configurable
+find_package(BLAS ${BLAS_IS_REQUIRED_ARG})
+#find_package(BLAS)
+if (BLAS_FOUND)
+   ecbuild_info("Found BLAS:")
+   ecbuild_info("  BLAS_LINKER_FLAGS: ${BLAS_LINKER_FLAGS}")
+   ecbuild_info("  BLAS_LIBRARIES: ${BLAS_LIBRARIES}")
+   if (BLAS95_FOUND)
+      ecbuild_info("Found BLAS95:")
+      ecbuild_info("  BLAS95_LIBRARIES: ${BLAS95_LIBRARIES}")
+   endif ()
 endif ()
 
 option (ESMA_ALLOW_DEPRECATED "suppress warnings about deprecated features" ON)
@@ -120,4 +161,13 @@ endmacro ()
 
 find_package(GitInfo)
 
-find_package(F2PY)
+option(USE_F2PY "Turn on F2PY builds" ON)
+
+if (USE_F2PY)
+   find_package(F2PY)
+endif ()
+
+# ecbuild by default puts modules in build-dir/module. This can cause issues if same-named modules
+# are in two directories that aren't using esma_add_library(). This sets the the value to
+# nothing with puts modules in the build directory equivalent of the source directory
+set(CMAKE_Fortran_MODULE_DIRECTORY "" CACHE PATH "Fortran module directory default" FORCE)
