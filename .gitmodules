@@ -1,0 +1,3 @@
+[submodule "ecbuild"]
+	path = ecbuild
+	url = https://github.com/GEOS-ESM/ecbuild.git
