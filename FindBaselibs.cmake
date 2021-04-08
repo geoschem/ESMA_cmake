@@ -201,5 +201,7 @@ target_compile_definitions(Baselibs INTERFACE
   H5_HAVE_PARALLEL
   NETCDF_NEED_NF_MPIIO
   HAS_NETCDF3
+  $<$<BOOL:${ADJOINT}>:ADJOINT>
+  $<$<BOOL:${REVERSE_OPERATORS}>:REVERSE_OPERATORS> 
   )
 install(TARGETS Baselibs EXPORT MAPL-targets)
