@@ -102,7 +102,7 @@ if(EXISTS ${ESMF_MK_FILEPATH})
    set(ESMF_F90LINKLIB_DIRS "${ESMF_F90LINKLIB_DIRS}" CACHE INTERNAL "ESMF link libraries dirs from ESMF_F90LINKLIBS")
 
    # Remove link lib entries that we always link anyways
-   set(ESMF_LINKLIBS_STD ${MPI_CXX_LIB_NAMES} stdc++ rt dl netcdf netcdff mpi_cxx)
+   set(ESMF_LINKLIBS_STD ${MPI_CXX_LIB_NAMES} stdc++ rt dl netcdf netcdff mpi_cxx mpi++)
    list(REMOVE_ITEM ESMF_F90LINKLIB_NAMES ${ESMF_LINKLIBS_STD})
    set(ESMF_F90LINKLIBS_3RD_PARTY "${ESMF_F90LINKLIB_NAMES}" CACHE INTERNAL "ESMF link libraries for 3rd party extensions")
 
