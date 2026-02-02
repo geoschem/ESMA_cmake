@@ -5,12 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Changes added for GCHP]
 
 ### Changed
+
 ### Fixed
+
 ### Removed
+
 ### Added
+- Added esma_add_fortran_submodules.cmake from ESMA_cmake v4.1.0 for MAPL3 compatibility
 
 ## [3.8.0] - 2021-Dec-16
 
