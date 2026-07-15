@@ -31,6 +31,7 @@ set (EXTENDED_SOURCE "-extend-source")
 set (FIXED_SOURCE "-fixed")
 set (DISABLE_FIELD_WIDTH_WARNING "-diag-disable 8291")
 set (DISABLE_GLOBAL_NAME_WARNING "-diag-disable 5462")
+set (DISABLE_IFORT_DEPRECATION_WARNING "-diag-disable=10448")
 set (CRAY_POINTER "")
 set (MCMODEL "-mcmodel medium -shared-intel")
 set (HEAPARRAYS "-heap-arrays 32")
@@ -65,7 +66,7 @@ add_definitions(-DHAVE_SHMEM)
 
 # Common Fortran Flags
 # --------------------
-set (common_Fortran_flags "${TRACEBACK} ${REALLOC_LHS}")
+set (common_Fortran_flags "${TRACEBACK} ${REALLOC_LHS} ${DISABLE_IFORT_DEPRECATION_WARNING}")
 set (common_Fortran_fpe_flags "${FPE0} ${FP_MODEL_SOURCE} ${HEAPARRAYS} ${NOOLD_MAXMINLOC}")
 
 # GEOS Debug
